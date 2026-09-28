@@ -1,0 +1,50 @@
+name: PC Virtual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pc-virtual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Atualizar sistema
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+
+      - name: Instalar ambiente gráfico
+        run: |
+          sudo apt install -y xfce4 xfce4-goodies xrdp
+          sudo systemctl enable xrdp
+          sudo systemctl start xrdp
+
+      - name: Criar usuário do PC
+        run: |
+          sudo useradd -m -s /bin/bash virtual
+          echo "virtual:Virtual123!" | sudo chpasswd
+          sudo usermod -aG sudo virtual
+
+      - name: Configurar XFCE
+        run: |
+          echo "startxfce4" | sudo tee /home/virtual/.xsession
+          sudo chown virtual:virtual /home/virtual/.xsession
+
+      - name: Mostrar informações
+        run: |
+          echo "================================"
+          echo "PC VIRTUAL INICIADO"
+          echo "Usuário: virtual"
+          echo "Senha: Virtual123!"
+          echo "Sistema:"
+          uname -a
+          echo "================================"
+
+      - name: Manter o PC ligado
+        run: |
+          echo "PC Virtual está funcionando..."
+          while true; do
+            date
+            sleep 60
+          done
